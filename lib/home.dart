@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:async';
@@ -45,24 +47,23 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final GlobalKey _formKey = GlobalKey();
   final TextEditingController controller = TextEditingController();
 
-  _onWrite(String text) {
-    setState(() {
-      print(text);
-    });
-  }
-
-  void printLatest() {
+  Future<File> onWrite() {
     print(controller.text);
     setState(() {});
+
+    return widget.storage.writeFile(controller.text);
   }
 
   @override
   void initState() {
     super.initState();
-
+    widget.storage.readfile().then((String value) {
+      setState(() {
+        controller.text = value;
+      });
+    });
     // controller.addListener(printLatest);
   }
 
@@ -94,7 +95,7 @@ class _HomeState extends State<Home> {
           border: Border(right: BorderSide(width: 1, color: Colors.black))),
       child: TextFormField(
         onChanged: (text) {
-          printLatest();
+          onWrite();
         },
         controller: controller,
         textInputAction: TextInputAction.newline,
@@ -109,8 +110,21 @@ class _HomeState extends State<Home> {
 
   Widget markdownPreview(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width / 2,
-      child: Text(controller.text),
-    );
+        width: MediaQuery.of(context).size.width / 2,
+        child: Markdown(
+          padding: EdgeInsets.all(10),
+          data: controller.text,
+        ));
+  }
+
+  FutureBuilder futureBuilder() {
+    return FutureBuilder(
+        future: widget.storage._localFile,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+            return Markdown(data: snapshot.data);
+          }
+          return Container();
+        });
   }
 }
