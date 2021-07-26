@@ -2,17 +2,23 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 class Storage {
-  Future<String> get _localPath async {
-    RegExp exp = RegExp(r"^(.*/)([^/]*)$");
-    final directory = await getApplicationDocumentsDirectory();
-    await for (var entity
-        in directory.list(recursive: true, followLinks: false)) {
+  Future<List<String>> getListFile() async {
+    List<String> listFile = [];
+    final dir = await getApplicationDocumentsDirectory();
+    await for (var entity in dir.list(recursive: true, followLinks: false)) {
       if (entity.path.contains(".md")) {
         print(entity.path);
         var split = entity.path.split("/");
         print(split[split.length - 1]);
+        listFile.add(split[split.length - 1]);
       }
     }
+    return listFile;
+  }
+
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
     // print("Dir : ${directory.path}");
     return directory.path;
   }
