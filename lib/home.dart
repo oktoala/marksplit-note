@@ -27,6 +27,7 @@ class _HomeState extends State<Home> {
 
   void refresh() async {
     listItem = await widget.storage.getFile();
+    setState(() {});
   }
 
   @override
@@ -50,7 +51,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Text("Haha"),
+      drawer: drawer(),
       appBar: AppBar(
         title: Text("MarkSplit Note"),
       ),
@@ -93,5 +94,25 @@ class _HomeState extends State<Home> {
         ));
   }
 
-  Widget drawer = Drawer();
+  Widget drawer() {
+    return Drawer(
+        child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        Container(
+            height: 89,
+            child: DrawerHeader(
+                decoration: BoxDecoration(color: Colors.blue),
+                child: Text(""))),
+        Container(
+          height: double.maxFinite,
+          child: ListView.builder(
+              itemCount: listItem.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Text(listItem[index]);
+              }),
+        ),
+      ],
+    ));
+  }
 }

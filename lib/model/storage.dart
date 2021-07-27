@@ -10,7 +10,7 @@ class Storage {
         var splitDir = item.path.split("/");
         var textMd = splitDir[splitDir.length - 1];
         var text = textMd.split(".md");
-        print(text);
+        print(text[0]);
         listItem.add(text[0]);
       }
     }
