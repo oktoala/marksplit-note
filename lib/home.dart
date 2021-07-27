@@ -18,6 +18,10 @@ class _HomeState extends State<Home> {
   final TextEditingController controller = TextEditingController();
   late List<String> listItem = [];
   var namaFile = "test";
+  late double halfWidth = MediaQuery.of(context).size.width / 2;
+  late double textInputWidth = MediaQuery.of(context).size.width / 2;
+  late double mdPreviewWidth = MediaQuery.of(context).size.width / 2;
+  String currentView = "split";
 
   Future<File> onWrite() {
     setState(() {});
@@ -53,7 +57,39 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawer: drawer(),
       appBar: AppBar(
-        title: Text("MarkSplit Note"),
+        actions: [
+          iconAction(() {
+            setState(() {
+              textInputWidth = halfWidth;
+              mdPreviewWidth = halfWidth;
+              currentView = "split";
+            });
+          },
+              currentView == "split"
+                  ? Icons.vertical_split
+                  : Icons.vertical_split_outlined),
+          iconAction(() {
+            setState(() {
+              textInputWidth = 0;
+              mdPreviewWidth = halfWidth * 2;
+              currentView = "read";
+            });
+          },
+              currentView == "read"
+                  ? Icons.remove_red_eye
+                  : Icons.remove_red_eye_outlined),
+          iconAction(() {
+            setState(() {
+              textInputWidth = halfWidth * 2;
+              mdPreviewWidth = 0;
+              currentView = "write";
+            });
+          }, currentView == "write" ? Icons.create : Icons.create_outlined)
+        ],
+        title: Text(
+          "MarkSplit Note",
+          style: TextStyle(fontSize: 16),
+        ),
       ),
       body: SafeArea(
         child: Row(
@@ -67,27 +103,27 @@ class _HomeState extends State<Home> {
   Widget textInput(BuildContext context) {
     return Scrollbar(
         child: Container(
-      padding: EdgeInsets.only(left: 10, top: 2),
-      decoration: BoxDecoration(
-          border: Border(right: BorderSide(width: 1, color: Colors.black))),
-      child: TextFormField(
-        onChanged: (text) {
-          onWrite();
-        },
-        controller: controller,
-        textInputAction: TextInputAction.newline,
-        keyboardType: TextInputType.multiline,
-        minLines: null,
-        maxLines: null,
-        expands: true,
-      ),
-      width: MediaQuery.of(context).size.width / 2,
-    ));
+            padding: EdgeInsets.only(left: 10, top: 2),
+            decoration: BoxDecoration(
+                border:
+                    Border(right: BorderSide(width: 1, color: Colors.black))),
+            child: TextFormField(
+              onChanged: (text) {
+                onWrite();
+              },
+              controller: controller,
+              textInputAction: TextInputAction.newline,
+              keyboardType: TextInputType.multiline,
+              minLines: null,
+              maxLines: null,
+              expands: true,
+            ),
+            width: textInputWidth));
   }
 
   Widget markdownPreview(BuildContext context) {
     return Container(
-        width: MediaQuery.of(context).size.width / 2,
+        width: mdPreviewWidth,
         child: Markdown(
           padding: EdgeInsets.all(10),
           data: controller.text,
@@ -114,5 +150,14 @@ class _HomeState extends State<Home> {
         ),
       ],
     ));
+  }
+
+  Widget iconAction(void Function() onpressed, IconData icon) {
+    return IconButton(
+        onPressed: onpressed,
+        icon: Icon(
+          icon,
+          color: icon.codePoint > 60000 ? Colors.white60 : Colors.white,
+        ));
   }
 }
